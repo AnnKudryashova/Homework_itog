@@ -1,0 +1,117 @@
+f(x) = -12x^4*sin(cos(x)) - 18x^3+5x^2 + 10x - 30
+Определить корни
+Найти интервалы, на которых функция возрастает
+Найти интервалы, на которых функция убывает
+Построить график
+Вычислить вершину
+Определить промежутки, на котором f > 0
+Определить промежутки, на котором f < 0
+
+from sympy import *
+from sympy.plotting import plot
+# from sympy import cos, sin,Interval, symbols, solveset
+from sympy import Interval, symbols, solveset
+from sympy.calculus.util import *
+from sympy import abc
+from numpy import arange
+from numpy import cos, sin
+from scipy import optimize
+from scipy.optimize import differential_evolution
+init_printing()
+
+def function(x):
+    return -12*sin(cos(x))*x**4 - 18*x**3+5*x**2 + 10*x - 30
+
+x = Symbol('x', real=True)
+f = -12*sin(cos(x))*x**4 - 18*x**3+5*x**2 + 10*x - 30
+plot(f,(x,-200,200))
+print(f)
+
+# По графику видно, что функция имеет бесконечное количество корней.
+# Я взяла совсем небольшой интервал функции от -5 до 5
+# Вычислим количество корней в этом интервале
+
+count = 0
+roots = function(-5)
+for i in arange (-5, 5, 0.001):
+    if roots * function(i) < 0: count += 1
+    roots = function(i)
+print(f"Количество корней в интервале от -5 до 5 = {count}")
+plot(f,(x,-5,5))
+print(f)
+
+# Количество корней 3
+
+# Найдем 3 корня
+
+def rootFunction(minX, maxX, step):
+    count = 0
+    if function(minX) - function(minX + step) < 0:
+        for i in arange (minX, maxX, step):
+            if function(i) > count: 
+                X = i
+                result = f"Функция возрастает\nx = {i} => f(x) = {function(i)}\nf(x) = 0 при x = {nsolve(f, X)}"
+                return result
+    if function(minX) - function(minX + step) > 0:
+        for i in arange (minX, maxX, step):
+            if function(i) < count: 
+                X = i
+                result = f"Функция убывает\nx = {i} => f(x) = {function(i)}\nf(x) = 0 при x = {nsolve(f, X)}"
+                return result
+
+# Корень № 1
+plot(f,(x,-2,2))
+print(f)
+print(rootFunction(-1.5, -1.3, 0.00001))
+
+ # x1 = -1.33896663927711
+ 
+ # Корень № 2 
+plot(f,(x,1.5,3))
+print(f)
+print(rootFunction(2.2, 2.3, 0.00001))
+
+# x2 = 2.27305684575625
+
+# Корень № 3
+plot(f,(x,3,5))
+print(f)
+print(rootFunction(4.35, 4.4, 0.00001))
+
+# x = 4.38352369796896
+
+# Найдем вершины в нашем интервале
+
+def extrFuncValue (func, bMin, bMax):
+    bounds = [(bMin, bMax)]
+    extrFuncValue = differential_evolution(func, bounds)
+    return (extrFuncValue.x,extrFuncValue.fun)
+
+print("Найдены следующие вершины:")
+res = extrFuncValue(lambda x:-function(x), -5,-1) 
+print(f"A ({res[0][0]}, {res[1] * -1})")
+res = extrFuncValue(function, -1, 2) 
+print(f"B ({res[0][0]}, {res[1]})")
+res = extrFuncValue(lambda x:-function(x), 2,4) 
+print(f"C ({res[0][0]}, {res[1] * -1})")
+
+
+Найдены следующие вершины:
+A (-4.167783530421969, 3111.363238735963)
+B (1.7006072713193556, -74.1062930861087)
+C (3.8193108255086323, 872.2557702910614)
+
+Зная вершины, можно вычислить интервалы убывания и возрастания функции:
+Возрастает при x ∈ [-5, -4,17..]
+Убывает при x ∈ [-4,17.., 1,7..]
+Возрастает при x ∈ [1,7.., 3,82..]
+Убывает при x ∈ [3,82.., 5]
+
+
+f(x) > 0 на промежутках:
+x ∈ [-5, -1.34..]
+x ∈ [2,27.., 4,38..]
+
+f(x) < 0 на промежутках:
+x ∈ [-1.34.., 2,27..]
+x ∈ [4,38.., 5]
